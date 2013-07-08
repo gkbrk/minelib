@@ -22,7 +22,7 @@ def parse_packet(data):
         keepalive_id=data_type_parser.parse_int(data)
         connection.send("\x00"+data_type_parser.int(keepalive_id))
 
-client=minelib.cracked_client("GKBRKbot")
+client=minelib.custom_client("GKBRKbot")
 connection=client.connect_to_server("localhost",25565)
 client.packet_handshake(connection)
 client.packet_client_statuses(connection,0)
