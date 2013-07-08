@@ -1,10 +1,8 @@
-import Queue
 import data_type_parser
 import packet_generators
 import packet_parsers
 import threading
 import minelib
-import io
 import cStringIO
 
 class packet_listener(threading.Thread):    
