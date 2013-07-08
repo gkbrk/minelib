@@ -4,7 +4,7 @@ import data_type_parser
 import packet_generators
 import packet_parsers
 
-class cracked_client():
+class custom_client():
     def __init__(self,username="Player"):
         self.username=username
     

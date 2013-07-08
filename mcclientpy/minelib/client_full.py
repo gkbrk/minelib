@@ -56,7 +56,7 @@ packet_functions={
 0x33:packet_parsers.parse_chunk_data
 }
 
-client=minelib.cracked_client("GKBRKbot")
+client=minelib.custom_client("GKBRKbot")
 connection=client.connect_to_server("localhost",25565)
 client.packet_handshake(connection)
 client.packet_client_statuses(connection,0)
