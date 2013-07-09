@@ -6,12 +6,12 @@ class packet_listener(threading.Thread):
     def run(self):
         while True:
             fileobj = connection.makefile()
-            packet_id = fileobj.read(1)
+            packet_id = ord(fileobj.read(1))
             if not packet_id == "":
-                if ord(packet_id) in packet_functions:
-                    packet_functions[ord(packet_id)](fileobj, connection)
+                if packet_id in packet_functions:
+                    print packet_functions[packet_id](fileobj, connection)
                 else:
-                    print ord(packet_id)
+                    print packet_id
                     import sys
                     sys.exit()
 
@@ -47,6 +47,8 @@ packet_functions = {
     0x2b: packet_parsers.parse_set_experience,
     0x33: packet_parsers.parse_chunk_data,
     0x46: packet_parsers.parse_change_game_state,
+    0x67: packet_parsers.parse_set_slot,
+    0x68: packet_parsers.parse_set_window_items,
     0xc9: packet_parsers.parse_player_list_item,
     0xca: packet_parsers.parse_player_abilities
 }

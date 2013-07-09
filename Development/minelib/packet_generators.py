@@ -6,7 +6,7 @@ This file generates the packets according to the protocol at wiki.vg/Protocol.
 import data_type_parser
 
 def packet_keepalive(keepalive_id):
-    return data_type_parser.int(keepalive_id)
+    return '\x00'+data_type_parser.int(keepalive_id)
 
 def packet_handshake(protocol_version, username, host, port):
     packet = '\x02' \
