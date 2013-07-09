@@ -16,10 +16,11 @@ class packet_listener(threading.Thread):
 class packet_listener1(threading.Thread):
     def run(self):
         while True:
-            packet_id=connection.recv(1)
+            fileobj=connection.makefile()
+            packet_id=fileobj.read(1)
             if not packet_id == "":
                 if ord(packet_id) in packet_functions:
-                    function = packet_functions[ord(packet_id)](connection)
+                    function = packet_functions[ord(packet_id)](fileobj,connection)
                 else:
                     print ord(packet_id)
                     import sys

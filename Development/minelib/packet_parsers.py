@@ -1,6 +1,7 @@
 """This file is used to parse the packets returned by the server."""
 
 import data_type_parser
+import mc_datatype
 import packet_generators
 import cStringIO
 
@@ -9,197 +10,189 @@ def makeio(string):
     return cStringIO.StringIO(string)
 
 
-def parse_keepalive(socket):
-    keepalive_id = data_type_parser.parse_int(makeio(socket.recv(4)))
+def parse_keepalive(fileobj,socket):
+    keepalive_id = data_type_parser.parse_int(fileobj)
     print "Got keepalive. Responding"
     socket.send(packet_generators.packet_keepalive(keepalive_id))
 
 
-def parse_login_request(socket):
+def parse_login_request(fileobj,socket):
     result = {}
-    result['EntityID'] = data_type_parser.parse_int(makeio(socket.recv(4)))
-    short1 = socket.recv(2)
-    lenght = data_type_parser.parse_short(makeio(short1))
-    result['LevelType'] = data_type_parser \
-        .parse_string8(makeio(data_type_parser.short(lenght) + socket.recv(lenght)))
-    result["GameMode"] = data_type_parser.parse_byte(makeio(socket.recv(1)))
-    result["Dimension"] = data_type_parser.parse_byte(makeio(socket.recv(1)))
-    result["Difficulty"] = data_type_parser.parse_byte(makeio(socket.recv(1)))
-    result["NotUsed"] = data_type_parser.parse_byte(makeio(socket.recv(1)))
-    result["MaxPlayers"] = data_type_parser.parse_byte(makeio(socket.recv(1)))
+    result['EntityID'] = data_type_parser.parse_int(fileobj)
+    result['LevelType'] = mc_datatype.readString(fileobj)
+    result["GameMode"] = data_type_parser.parse_byte(fileobj)
+    result["Dimension"] = data_type_parser.parse_byte(fileobj)
+    result["Difficulty"] = data_type_parser.parse_byte(fileobj)
+    result["NotUsed"] = data_type_parser.parse_byte(fileobj)
+    result["MaxPlayers"] = data_type_parser.parse_byte(fileobj)
     return result
 
 
-def parse_spawn_position(socket):
+def parse_spawn_position(fileobj,socket):
     result = {}
-    result["X"] = data_type_parse.parse_int(makeio(socket.recv(4)))
-    result["Y"] = data_type_parse.parse_int(makeio(socket.recv(4)))
-    result["Z"] = data_type_parse.parse_int(makeio(socket.recv(4)))
+    result["X"] = data_type_parse.parse_int(fileobj)
+    result["Y"] = data_type_parse.parse_int(fileobj)
+    result["Z"] = data_type_parse.parse_int(fileobj)
     print result
     return result
 
 
-def parse_chat_message(socket):
-    short1 = socket.recv(2)
-    lenght = data_type_parser.parse_short(short1)
-    chat_message = socket.recv(lenght)
+def parse_chat_message(fileobj,socket):
+    chat_message = mc_datatype.readString(fileobj)
     return chat_message
 
 
-def parse_time_update(socket):
+def parse_time_update(fileobj,socket):
     result = {}
-    result["WorldAge"] = data_type_parser.parse_long(makeio(socket.recv(8)))
-    result["TimeOfDay"] = data_type_parser.parse_long(makeio(socket.recv(8)))
+    result["WorldAge"] = data_type_parser.parse_long(fileobj)
+    result["TimeOfDay"] = data_type_parser.parse_long(fileobj)
     return result
 
 
-def parse_entity_equipment(socket):
+def parse_entity_equipment(fileobj,socket):
     #Not implemented yet.
     pass
 
 
-def parse_health_update(socket):
+def parse_health_update(fileobj,socket):
     result = {}
-    result["Health"] = data_type_parser.parse_int(makeio(socket.recv(4)))
-    result["Food"] = data_type_parser.parse_int(makeio(socket.recv(4)))
-    result["FoodSaturation"] = data_type_parser.parse_float(makeio(socket.recv(4)))
+    result["Health"] = data_type_parser.parse_int(fileobj)
+    result["Food"] = data_type_parser.parse_int(fileobj)
+    result["FoodSaturation"] = data_type_parser.parse_float(fileobj)
     return result
 
 
-def parse_respawn(socket):
+def parse_respawn(fileobj,socket):
     result = {}
-    result["Dimension"] = data_type_parser.parse_int(makeio(socket.recv(4)))
-    result["Difficulty"] = data_type_parser.parse_byte(makeio(socket.recv(1)))
-    result["GameMode"] = data_type_parser.parse_byte(makeio(socket.recv(1)))
-    result["WorldHeight"] = data_type_parser.parse_short(makeio(socket.recv(2)))
-    short1 = socket.recv(2)
-    lenght = data_type_parser.parse_short(short1)
-    result["LevelType"] = data_type_parser \
-        .parse_string8(makeio(data_type_parser.short(lenght)+socket.recv(lenght)))
+    result["Dimension"] = data_type_parser.parse_int(fileobj)
+    result["Difficulty"] = data_type_parser.parse_byte(fileobj)
+    result["GameMode"] = data_type_parser.parse_byte(fileobj)
+    result["WorldHeight"] = data_type_parser.parse_short(fileobj)
+    result["LevelType"] = mc_datatype.readString(fileobj)
     return result
 
 
-def parse_player_pos_and_look(socket):
+def parse_player_pos_and_look(fileobj,socket):
     #Not fully implemented. Just responding with an appropriate packet.
-    socket.send("0x0d"+socket.recv(41))
+    socket.send("0x0d"+fileobj.read(41))
 
 
-def parse_held_item_change(socket):
-    slot_id = data_type_parser.parse_short(makeio(socket.recv(2)))
+def parse_held_item_change(fileobj,socket):
+    slot_id = data_type_parser.parse_short(fileobj)
     return slot_id
 
 
-def parse_use_bed(socket):
+def parse_use_bed(fileobj,socket):
     # Not fully implemented. Just getting the appropriate packet data.
-    data = socket.recv(14)
+    data = fileobj.read(14)
 
 
-def parse_animation(socket):
+def parse_animation(fileobj,socket):
     # Not fully implemented. Just getting the appropriate packet data.
-    data = socket.recv(5)
+    data = fileobj.read(5)
 
 
-def parse_spawn_named_entity(socket):
+def parse_spawn_named_entity(fileobj,socket):
     # Not implemented yet.
     pass
 
 
-def parse_collect_item(socket):
+def parse_collect_item(fileobj,socket):
     # Not fully implemented. Just getting the appropriate packet data.
-    data = socket.recv(8)
+    data = fileobj.read(8)
 
 
-def parse_spawn_painting(socket):
+def parse_spawn_painting(fileobj,socket):
     result = {}
-    result["EntitiyID"] = data_type_parser.parse_int(makeio(socket.recv(4)))
-    short1 = socket.recv(2)
+    result["EntitiyID"] = data_type_parser.parse_int(fileobj)
+    short1 = fileobj.read(2)
     lenght = data_type_parser.parse_short(makeio(short1))
-    result["Title"] = data_type_parser.parse_string8(makeio(data_type_parser.short(lenght)+socket.recv(lenght)))
-    result["X"] = data_type_parser.parse_int(makeio(socket.recv(4)))
-    result["Y"] = data_type_parser.parse_int(makeio(socket.recv(4)))
-    result["Z"] = data_type_parser.parse_int(makeio(socket.recv(4)))
-    result["Direction"] = data_type_parser.parse_int(makeio(socket.recv(4)))
+    result["Title"] = data_type_parser.parse_string8(makeio(data_type_parser.short(lenght)+fileobj.read(lenght)))
+    result["X"] = data_type_parser.parse_int(fileobj)
+    result["Y"] = data_type_parser.parse_int(fileobj)
+    result["Z"] = data_type_parser.parse_int(fileobj)
+    result["Direction"] = data_type_parser.parse_int(fileobj)
     return result
 
 
-def parse_spawn_exp_orb(socket):
+def parse_spawn_exp_orb(fileobj,socket):
     result={}
-    result["EntityID"]=data_type_parser.parse_int(makeio(socket.recv(4)))
-    result["X"]=data_type_parser.parse_int(makeio(socket.recv(4)))
-    result["Y"]=data_type_parser.parse_int(makeio(socket.recv(4)))
-    result["Z"]=data_type_parser.parse_int(makeio(socket.recv(4)))
-    result["Count"]=data_type_parser.parse_short(makeio(socket.recv(2)))
+    result["EntityID"]=data_type_parser.parse_int(fileobj)
+    result["X"]=data_type_parser.parse_int(fileobj)
+    result["Y"]=data_type_parser.parse_int(fileobj)
+    result["Z"]=data_type_parser.parse_int(fileobj)
+    result["Count"]=data_type_parser.parse_short(fileobj)
     return result
 
 
-def parse_entity_velocity(socket):
+def parse_entity_velocity(fileobj,socket):
     # Not fully implemented. Just getting the appropriate packet data.
-    data = socket.recv(10)
+    data = fileobj.read(10)
 
 
-def parse_destroy_entity(socket):
+def parse_destroy_entity(fileobj,socket):
     # Not fully implemented. Just getting the appropriate packet data.
-    entity_count = data_type_parser.parse_byte(makeio(socket.recv(1)))
+    entity_count = data_type_parser.parse_byte(fileobj)
     for i in range(entity_count):
-        socket.recv(4)
+        fileobj.read(4)
 
 
-def parse_entity(socket):
+def parse_entity(fileobj,socket):
     # Not fully implemented. Just getting the appropriate packet data.
-    data = socket.recv(4)
+    data = fileobj.read(4)
 
 
-def parse_entity_relative_move(socket):
+def parse_entity_relative_move(fileobj,socket):
     # Not fully implemented. Just getting the appropriate packet data.
-    data = socket.recv(7)
+    data = fileobj.read(7)
 
 
-def parse_entity_look(socket):
+def parse_entity_look(fileobj,socket):
     # Not fully implemented. Just getting the appropriate packet data.
-    data = socket.recv(6)
+    data = fileobj.read(6)
 
 
-def parse_entity_look_and_relative_move(socket):
+def parse_entity_look_and_relative_move(fileobj,socket):
     # Not fully implemented. Just getting the appropriate packet data.
-    data = socket.recv(9)
+    data = fileobj.read(9)
 
 
-def parse_entity_teleport(socket):
+def parse_entity_teleport(fileobj,socket):
     # Not fully implemented. Just getting the appropriate packet data.
-    data = socket.recv(18)
+    data = fileobj.read(18)
 
 
-def parse_entity_head_look(socket):
+def parse_entity_head_look(fileobj,socket):
     # Not fully implemented. Just getting the appropriate packet data.
-    data = socket.recv(5)
+    data = fileobj.read(5)
 
 
-def parse_entity_status(socket):
+def parse_entity_status(fileobj,socket):
     # Not fully implemented. Just getting the appropriate packet data.
-    data = socket.recv(5)
+    data = fileobj.read(5)
 
 
-def parse_attach_entity(socket):
+def parse_attach_entity(fileobj,socket):
     # Not fully implemented. Just getting the appropriate packet data.
-    data = socket.recv(8)
+    data = fileobj.read(8)
 
 
-def parse_entity_effect(socket):
+def parse_entity_effect(fileobj,socket):
     # Not fully implemented. Just getting the appropriate packet data.
-    data = socket.recv(8)
+    data = fileobj.read(8)
 
 
-def parse_remove_entity_effect(socket):
+def parse_remove_entity_effect(fileobj,socket):
     # Not fully implemented. Just getting the appropriate packet data.
-    data = socket.recv(5)
+    data = fileobj.read(5)
 
 
-def parse_set_experience(socket):
+def parse_set_experience(fileobj,socket):
     # Not fully implemented. Just getting the appropriate packet data.
-    data = socket.recv(8)
+    data = fileobj.read(8)
 
 
-def parse_chunk_data(socket):
-    socket.recv(13)
-    size = data_type_parser.parse_int(makeio(socket.recv(4)))
-    socket.recv(size)
+def parse_chunk_data(fileobj,socket):
+    fileobj.read(13)
+    size = data_type_parser.parse_int(fileobj)
+    fileobj.read(size)
