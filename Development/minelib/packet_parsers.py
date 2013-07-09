@@ -181,8 +181,12 @@ def parse_spawn_exp_orb(fileobj, socket):
 
 
 def parse_entity_velocity(fileobj, socket):
-    # Not fully implemented. Just getting the appropriate packet data.
-    data = fileobj.read(10)
+    result={}
+    result["EntityID"]=mc_datatype.readInt(fileobj)
+    result["VelocityX"]=mc_datatype.readShort(fileobj)
+    result["VelocityY"]=mc_datatype.readShort(fileobj)
+    result["VelocityZ"]=mc_datatype.readShort(fileobj)
+    return result
 
 
 def parse_destroy_entity(fileobj, socket):
@@ -193,8 +197,9 @@ def parse_destroy_entity(fileobj, socket):
 
 
 def parse_entity(fileobj, socket):
-    # Not fully implemented. Just getting the appropriate packet data.
-    data = fileobj.read(4)
+    result={}
+    result["EntityID"]=mc_datatype.readInt(fileobj)
+    return result
 
 
 def parse_entity_relative_move(fileobj, socket):
@@ -203,8 +208,11 @@ def parse_entity_relative_move(fileobj, socket):
 
 
 def parse_entity_look(fileobj, socket):
-    # Not fully implemented. Just getting the appropriate packet data.
-    data = fileobj.read(6)
+    result={}
+    result["EntityID"]=mc_datatype.readInt(fileobj)
+    result["Yaw"]=mc_datatype.readByte(fileobj)
+    result["Pitch"]=mc_datatype.readByte(fileobj)
+    return result
 
 
 def parse_entity_look_and_relative_move(fileobj, socket):
@@ -248,8 +256,11 @@ def parse_remove_entity_effect(fileobj, socket):
 
 
 def parse_set_experience(fileobj, socket):
-    # Not fully implemented. Just getting the appropriate packet data.
-    data = fileobj.read(8)
+    result={}
+    result["ExperienceBar"]=mc_datatype.readFloat(fileobj)
+    result["Level"]=mc_datatype.readShort(fileobj)
+    result["TotalExp"]=mc_datatype.readShort(fileobj)
+    return result
 
 
 def parse_chunk_data(fileobj, socket):
