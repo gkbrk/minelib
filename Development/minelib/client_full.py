@@ -1,32 +1,21 @@
-import data_type_parser
-import packet_generators
 import packet_parsers
 import threading
 import minelib
 
-
 class packet_listener(threading.Thread):
     def run(self):
         while True:
-            data = connection.recv(100000)
-            if data != "":
-                parse_packet(data)
-
-
-class packet_listener1(threading.Thread):
-    def run(self):
-        while True:
-            fileobj=connection.makefile()
-            packet_id=fileobj.read(1)
+            fileobj = connection.makefile()
+            packet_id = fileobj.read(1)
             if not packet_id == "":
                 if ord(packet_id) in packet_functions:
-                    function = packet_functions[ord(packet_id)](fileobj,connection)
+                    packet_functions[ord(packet_id)](fileobj, connection)
                 else:
                     print ord(packet_id)
                     import sys
                     sys.exit()
 
-packet_functions={
+packet_functions = {
     0x00: packet_parsers.parse_keepalive,
     0x01: packet_parsers.parse_login_request,
     0x03: packet_parsers.parse_chat_message,
