@@ -58,7 +58,7 @@ def parse_double(sio):
     return unpack('>d', sio.read(8))[0]
 
 def string8(data):
-    return short(len(data))+data
+    return short(len(data)) + data
 
 def parse_string8(sio):
     length = parse_short(sio)
@@ -66,7 +66,7 @@ def parse_string8(sio):
 
 def string16(data):
     chars = ''.join([shortchar(i) for i in data])
-    return short(len(data))+chars
+    return short(len(data)) + chars
 
 def parse_string16(sio):
     length = parse_short(sio)

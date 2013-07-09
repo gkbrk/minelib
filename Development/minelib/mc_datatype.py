@@ -1,4 +1,4 @@
-#Source pyCraft project
+# Source pyCraft project
 import struct
 import types
 from io import BytesIO
@@ -98,8 +98,8 @@ def readEntityMetadata(FileObject):
     metadata = {}
     byte = readUnsignedByte(FileObject)
     while byte != 127:
-        index = byte & 0x1F # Lower 5 bits
-        ty = byte >> 5   # Upper 3 bits
+        index = byte & 0x1F  # Lower 5 bits
+        ty = byte >> 5  # Upper 3 bits
         if ty == 0: val = readByte(FileObject)
         if ty == 1: val = readShort(FileObject)
         if ty == 2: val = readInt(FileObject)
@@ -143,6 +143,6 @@ def readSlotData(FileObject):
                 'ItemCount': ItemCount,
                 'Damage': Damage
                 }
-    return {'BlockID': -1,
+    return {'BlockID':-1,
             'ItemCount': 0
             }
