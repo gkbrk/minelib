@@ -30,10 +30,9 @@ def parse_login_request(fileobj,socket):
 
 def parse_spawn_position(fileobj,socket):
     result = {}
-    result["X"] = data_type_parse.parse_int(fileobj)
-    result["Y"] = data_type_parse.parse_int(fileobj)
-    result["Z"] = data_type_parse.parse_int(fileobj)
-    print result
+    result["X"] = data_type_parser.parse_int(fileobj)
+    result["Y"] = data_type_parser.parse_int(fileobj)
+    result["Z"] = data_type_parser.parse_int(fileobj)
     return result
 
 
@@ -50,8 +49,11 @@ def parse_time_update(fileobj,socket):
 
 
 def parse_entity_equipment(fileobj,socket):
-    #Not implemented yet.
-    pass
+    result={}
+    result["EntityID"]=data_type_parser.parse_int(fileobj)
+    result["Slot"]=data_type_parser.parse_short(fileobj)
+    result["SlotData"]=mc_datatype.readSlotData(fileobj)
+    return result
 
 
 def parse_health_update(fileobj,socket):
@@ -105,9 +107,7 @@ def parse_collect_item(fileobj,socket):
 def parse_spawn_painting(fileobj,socket):
     result = {}
     result["EntitiyID"] = data_type_parser.parse_int(fileobj)
-    short1 = fileobj.read(2)
-    lenght = data_type_parser.parse_short(makeio(short1))
-    result["Title"] = data_type_parser.parse_string8(makeio(data_type_parser.short(lenght)+fileobj.read(lenght)))
+    result["Title"] = mc_datatype.readString(fileobj)
     result["X"] = data_type_parser.parse_int(fileobj)
     result["Y"] = data_type_parser.parse_int(fileobj)
     result["Z"] = data_type_parser.parse_int(fileobj)
@@ -196,3 +196,18 @@ def parse_chunk_data(fileobj,socket):
     fileobj.read(13)
     size = data_type_parser.parse_int(fileobj)
     fileobj.read(size)
+
+def parse_change_game_state(fileobj,socket):
+    # Not fully implemented. Just getting the appropriate packet data.
+    data = fileobj.read(2)
+
+def parse_player_list_item(fileobj,socket):
+    result={}
+    result["PlayerName"]=mc_datatype.readString(fileobj)
+    result["Online"]=mc_datatype.readBoolean(fileobj)
+    result["Ping"]=data_type_parser.parse_short(fileobj)
+    return result
+
+def parse_player_abilities(fileobj,socket):
+    #Not fully implemented. Just getting the appropriate data.
+    data = fileobj.read(3)

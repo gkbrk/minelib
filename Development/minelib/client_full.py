@@ -57,6 +57,9 @@ packet_functions={
     0x2a: packet_parsers.parse_remove_entity_effect,
     0x2b: packet_parsers.parse_set_experience,
     0x33: packet_parsers.parse_chunk_data,
+    0x46: packet_parsers.parse_change_game_state,
+    0xc9: packet_parsers.parse_player_list_item,
+    0xca: packet_parsers.parse_player_abilities
 }
 
 client = minelib.custom_client("GKBRKbot")
