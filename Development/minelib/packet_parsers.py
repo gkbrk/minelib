@@ -3,6 +3,8 @@
 import data_type_parser
 import mc_datatype
 import packet_generators
+import pynbt
+import io
 import cStringIO
 
 
@@ -105,6 +107,57 @@ def parse_collect_item(fileobj, socket):
     # Not fully implemented. Just getting the appropriate packet data.
     data = fileobj.read(8)
 
+def parse_spawn_object_vehicle(fileobj,socket):
+    FileObject=fileobj
+    EntityID = mc_datatype.readInt(FileObject)
+    Type = mc_datatype.readByte(FileObject)
+    x = mc_datatype.readInt(FileObject)
+    y = mc_datatype.readInt(FileObject)
+    z = mc_datatype.readInt(FileObject)
+    yaw = mc_datatype.readByte(FileObject)
+    pitch = mc_datatype.readByte(FileObject)
+    data = mc_datatype.readInt(FileObject)
+    if (data > 0):
+        SpeedX = mc_datatype.readShort(FileObject)
+        SpeedY = mc_datatype.readShort(FileObject)
+        SpeedZ = mc_datatype.readShort(FileObject)
+        return {'EntityID': EntityID,
+                'Type': Type,
+                'x': x,
+                'y': y,
+                'z': z,
+                'yaw': yaw,
+                'pitch': pitch,
+                'SpeedX': SpeedX,
+                'SpeedY': SpeedY,
+                'SpeedZ': SpeedZ
+        }
+    else:
+        return {'EntityID': EntityID,
+                'Type': Type,
+                'x': x,
+                'y': y,
+                'z': z,
+                'yaw': yaw,
+                'pitch': pitch
+        }
+
+def parse_spawn_mob(fileobj,socket):
+    result={}
+    result["EntityID"]=mc_datatype.readInt(fileobj)
+    result["Type"]=mc_datatype.readByte(fileobj)
+    result["X"]=mc_datatype.readInt(fileobj)
+    result["Y"]=mc_datatype.readInt(fileobj)
+    result["Z"]=mc_datatype.readInt(fileobj)
+    result["Pitch"]=mc_datatype.readByte(fileobj)
+    result["HeadPitch"]=mc_datatype.readByte(fileobj)
+    result["Yaw"]=mc_datatype.readByte(fileobj)
+    result["VelocityX"]=mc_datatype.readShort(fileobj)
+    result["VelocityY"]=mc_datatype.readShort(fileobj)
+    result["VelocityZ"]=mc_datatype.readShort(fileobj)
+    result["Metadata"]=mc_datatype.readEntityMetadata(fileobj)
+    return result
+
 
 def parse_spawn_painting(fileobj, socket):
     result = {}
@@ -178,6 +231,11 @@ def parse_attach_entity(fileobj, socket):
     # Not fully implemented. Just getting the appropriate packet data.
     data = fileobj.read(8)
 
+def parse_entity_metadata(fileobj, socket):
+    result={}
+    result["EntityID"]=mc_datatype.readInt(fileobj)
+    result["EntityMetadata"]=mc_datatype.readEntityMetadata(fileobj)
+    return result
 
 def parse_entity_effect(fileobj, socket):
     # Not fully implemented. Just getting the appropriate packet data.
@@ -198,6 +256,52 @@ def parse_chunk_data(fileobj, socket):
     fileobj.read(13)
     size = data_type_parser.parse_int(fileobj)
     fileobj.read(size)
+
+def parse_block_change(fileobj, socket):
+    result={}
+    result["X"]=mc_datatype.readInt(fileobj)
+    result["Y"]=mc_datatype.readByte(fileobj)
+    result["Z"]=mc_datatype.readInt(fileobj)
+    result["BlockType"]=mc_datatype.readShort(fileobj)
+    result["BlockMetadata"]=mc_datatype.readByte(fileobj)
+
+def parse_map_chunk_bulk(fileobj,socket):
+    FileObject=fileobj
+    #short - number of chunks
+    ChunkCount = mc_datatype.readShort(FileObject)
+
+    #int - chunk data length
+    ChunkDataLength = mc_datatype.readInt(FileObject)
+    SkyLightSent = mc_datatype.readBoolean(FileObject)
+    RawData = FileObject.read(ChunkDataLength)
+
+    metadata = []
+    for i in range(ChunkCount):
+        ChunkX = mc_datatype.readInt(FileObject)
+        ChunkZ = mc_datatype.readInt(FileObject)
+        PrimaryBitMap = mc_datatype.readUnsignedShort(FileObject)
+        AddBitMap = mc_datatype.readUnsignedShort(FileObject)
+        metadata.append({'x': ChunkX,
+                         'z': ChunkZ,
+                         'PrimaryBitMap': PrimaryBitMap,
+                         'AddBitMap': AddBitMap
+                         })
+
+    return {'ChunkCount': ChunkCount,
+            'SkyLightSent': SkyLightSent,
+            'RawData': RawData,
+            'ChunkMeta': metadata
+    }
+
+def parse_named_sound_effect(fileobj, socket):
+    result={}
+    result["SoundName"]=mc_datatype.readString(fileobj)
+    result["EffectPositionX"]=mc_datatype.readInt(fileobj)
+    result["EffectPositionY"]=mc_datatype.readInt(fileobj)
+    result["EffectPositionZ"]=mc_datatype.readInt(fileobj)
+    result["Volume"]=mc_datatype.readFloat(fileobj)
+    result["Pitch"]=mc_datatype.readByte(fileobj)
+    return result
 
 def parse_change_game_state(fileobj, socket):
     # Not fully implemented. Just getting the appropriate packet data.
@@ -220,6 +324,28 @@ def parse_set_window_items(fileobj,socket):
         slots.append(slotdata)
     result["Slots"]=slots
     return result
+
+def parse_update_tile_entity(fileobj, socket):
+    FileObject=fileobj
+    X = mc_datatype.readInt(FileObject)
+    Y = mc_datatype.readShort(FileObject)
+    Z = mc_datatype.readInt(FileObject)
+    Action = mc_datatype.readByte(FileObject)
+    DataLength = mc_datatype.readShort(FileObject)
+    if (DataLength != -1):
+        ByteArray = mc_datatype.readByteArray(FileObject, DataLength)
+        NBTData = pynbt.NBTFile(io.BytesIO(ByteArray), compression=pynbt.NBTFile.Compression.GZIP)
+        return {'x': X,
+                'y': Y,
+                'z': Z,
+                'Action': Action,
+                'NBTData': NBTData
+        }
+    return {'x': X,
+            'y': Y,
+            'z': Z,
+            'Action': Action
+    }
 
 def parse_player_list_item(fileobj, socket):
     result = {}
