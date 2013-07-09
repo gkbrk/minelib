@@ -49,6 +49,7 @@ packet_functions = {
     0x2a: packet_parsers.parse_remove_entity_effect,
     0x2b: packet_parsers.parse_set_experience,
     0x33: packet_parsers.parse_chunk_data,
+    0x34: packet_parsers.parse_multi_block_change,
     0x35: packet_parsers.parse_block_change,
     0x38: packet_parsers.parse_map_chunk_bulk,
     0x3e: packet_parsers.parse_named_sound_effect,

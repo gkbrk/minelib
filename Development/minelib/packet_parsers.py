@@ -257,6 +257,15 @@ def parse_chunk_data(fileobj, socket):
     size = data_type_parser.parse_int(fileobj)
     fileobj.read(size)
 
+def parse_multi_block_change(fileobj,socket):
+    result={}
+    result["ChunkX"]=mc_datatype.readInt(fileobj)
+    result["ChunkZ"]=mc_datatype.readInt(fileobj)
+    result["RecordCount"]=mc_datatype.readShort(fileobj)
+    result["DataSize"]=mc_datatype.readInt(fileobj)
+    data = fileobj.read(result["DataSize"]) #Not implemented yet.
+    return result
+
 def parse_block_change(fileobj, socket):
     result={}
     result["X"]=mc_datatype.readInt(fileobj)
