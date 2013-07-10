@@ -11,13 +11,16 @@ import cStringIO
 def makeio(string):
     return cStringIO.StringIO(string)
 
+def generate_return_data(packetname,packetdata):
+    return {"PacketName":packetname, "PacketData":packetdata}
+
 
 def parse_keepalive(fileobj, socket):
-    keepalive_id = mc_datatype.readInt(fileobj)
-    print "Got keepalive. Responding"
+    result={}
+    result["KeepaliveID"] = mc_datatype.readInt(fileobj)
     socket.send("\x00")
-    mc_datatype.sendInt(socket,keepalive_id)
-    return "Keepalive"
+    mc_datatype.sendInt(socket,result["KeepaliveID"])
+    return generate_return_data("Keep-alive",result)
 
 
 def parse_login_request(fileobj, socket):
@@ -29,7 +32,7 @@ def parse_login_request(fileobj, socket):
     result["Difficulty"] = mc_datatype.readByte(fileobj)
     result["NotUsed"] = mc_datatype.readByte(fileobj)
     result["MaxPlayers"] = mc_datatype.readByte(fileobj)
-    return result
+    return generate_return_data("Login_Request",result)
 
 
 def parse_spawn_position(fileobj, socket):
@@ -37,19 +40,20 @@ def parse_spawn_position(fileobj, socket):
     result["X"] = data_type_parser.parse_int(fileobj)
     result["Y"] = data_type_parser.parse_int(fileobj)
     result["Z"] = data_type_parser.parse_int(fileobj)
-    return result
+    return generate_return_data("Spawn_Position",result)
 
 
 def parse_chat_message(fileobj, socket):
-    chat_message = mc_datatype.readString(fileobj)
-    return {"ChatMessage":chat_message}
+    result={}
+    result["ChatMessage"] = mc_datatype.readString(fileobj)
+    return generate_return_data("Chat_Message",result)
 
 
 def parse_time_update(fileobj, socket):
     result = {}
     result["WorldAge"] = data_type_parser.parse_long(fileobj)
     result["TimeOfDay"] = data_type_parser.parse_long(fileobj)
-    return result
+    return generate_return_data("Time_Update",result)
 
 
 def parse_entity_equipment(fileobj, socket):
@@ -57,7 +61,7 @@ def parse_entity_equipment(fileobj, socket):
     result["EntityID"] = data_type_parser.parse_int(fileobj)
     result["Slot"] = data_type_parser.parse_short(fileobj)
     result["SlotData"] = mc_datatype.readSlotData(fileobj)
-    return result
+    return generate_return_data("Entity_Equipment",result)
 
 
 def parse_health_update(fileobj, socket):
@@ -65,7 +69,7 @@ def parse_health_update(fileobj, socket):
     result["Health"] = data_type_parser.parse_int(fileobj)
     result["Food"] = data_type_parser.parse_int(fileobj)
     result["FoodSaturation"] = data_type_parser.parse_float(fileobj)
-    return result
+    return generate_return_data("Health_Update",result)
 
 
 def parse_respawn(fileobj, socket):
@@ -75,7 +79,7 @@ def parse_respawn(fileobj, socket):
     result["GameMode"] = mc_datatype.readByte(fileobj)
     result["WorldHeight"] = data_type_parser.parse_short(fileobj)
     result["LevelType"] = mc_datatype.readString(fileobj)
-    return result
+    return generate_return_data("Respawn",result)
 
 
 def parse_player_pos_and_look(fileobj, socket):
