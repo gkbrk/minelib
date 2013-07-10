@@ -324,8 +324,10 @@ def parse_named_sound_effect(fileobj, socket):
     return result
 
 def parse_change_game_state(fileobj, socket):
-    # Not fully implemented. Just getting the appropriate packet data.
-    data = fileobj.read(2)
+    result={}
+    result["Reason"]=mc_datatype.readByte(fileobj)
+    result["GameMode"]=mc_datatype.readByte(fileobj)
+    return result
 
 def parse_set_slot(fileobj,socket):
     result={}
