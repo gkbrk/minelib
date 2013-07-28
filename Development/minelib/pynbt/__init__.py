@@ -1,5 +1,5 @@
 # -*- coding: utf8 -*-
-from pynbt.nbt import (
+from nbt import (
     NBTFile,
     TAG_Byte,
     TAG_Short,

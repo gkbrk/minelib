@@ -381,5 +381,17 @@ def parse_player_list_item(fileobj, socket):
     return result
 
 def parse_player_abilities(fileobj, socket):
-    # Not fully implemented. Just getting the appropriate data.
-    data = fileobj.read(3)
+    result={}
+    result["Flags"]=mc_datatype.readByte(fileobj)
+    result["FlyingSpeed"]=mc_datatype.readByte(fileobj)
+    result["WalkingSpeed"]=mc_datatype.readByte(fileobj)
+    return result
+
+def parse_encryption_key_request(fileobj, socket):
+    result={}
+    result["ServerID"]=mc_datatype.readString(fileobj)
+    result["PublicKeyLength"]=mc_datatype.readShort(fileobj)
+    result["PublicKey"]=mc_datatype.readByteArray(fileobj,result["PublicKeyLength"])
+    result["VerifyTokenLength"]=mc_datatype.readShort(fileobj)
+    result["VerifyToken"]=mc_datatype.readByteArray(fileobj,result["VerifyTokenLength"])
+    return result

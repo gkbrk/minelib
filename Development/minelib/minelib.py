@@ -3,6 +3,7 @@ import struct
 import data_type_parser
 import packet_generators
 import packet_parsers
+import client_full
 
 
 class custom_client():
@@ -34,26 +35,35 @@ class custom_client():
     def connect_to_server(self, host, port):
         self.host = host
         self.port = port
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.connect((host, port))
-        return s
+        self.connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.connection.connect((host, port))
 
-    def packet_handshake(self, s):
+    def packet_handshake(self):
         username = self.username
         host = self.host
         port = self.port
         packet = packet_generators.packet_handshake(61, username, host, port)
-        s.send(packet)
-        data = s.recv(1024)
+        self.connection.send(packet)
+        data = self.connection.recv(1024)
         if data[0] == "\xfd":
             return True
         else:
             return False
 
-    def packet_client_statuses(self, s, payload=0):
+    def packet_client_statuses(self, payload=0):
         packet = packet_generators.packet_client_statuses(payload)
-        s.send(packet)
+        self.connection.send(packet)
 
     def packet_chat_message(self, s, msg):
         packet = packet_generators.packet_chat_message(msg)
         s.send(packet)
+    
+    def do_server_login(self, host, port=25565, join_message="Hello Minelib!"):
+        self.connect_to_server(host, port)
+        self.packet_handshake()
+        self.packet_client_statuses(0)
+        client_full.packet_listener(self.connection).start()
+        return self
+    
+    def disconnect(self, reason="Disconnected by user!"):
+        self.connection.send(packet_generators.packet_disconnect(reason))
