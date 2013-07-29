@@ -66,7 +66,7 @@ def parse_entity_equipment(fileobj, socket):
 
 def parse_health_update(fileobj, socket):
     result = {}
-    result["Health"] = data_type_parser.parse_int(fileobj)
+    result["Health"] = data_type_parser.parse_float(fileobj)
     result["Food"] = data_type_parser.parse_int(fileobj)
     result["FoodSaturation"] = data_type_parser.parse_float(fileobj)
     return generate_return_data("Health_Update",result)
@@ -241,7 +241,7 @@ def parse_entity_status(fileobj, socket):
 
 def parse_attach_entity(fileobj, socket):
     # Not fully implemented. Just getting the appropriate packet data.
-    data = fileobj.read(8)
+    data = fileobj.read(9)
 
 def parse_entity_metadata(fileobj, socket):
     result={}
@@ -266,6 +266,23 @@ def parse_set_experience(fileobj, socket):
     result["TotalExp"]=mc_datatype.readShort(fileobj)
     return result
 
+def parse_entity_properties(FileObject,socket):
+    EntityID = mc_datatype.readInt(FileObject)
+    PropertiesCount = mc_datatype.readInt(FileObject)
+    Properties = {}
+    for i in range(PropertiesCount):
+        key = mc_datatype.readString(FileObject)
+        value = mc_datatype.readDouble(FileObject)
+        Properties[key] = value
+        len = mc_datatype.readShort(FileObject)
+        for x in range(len):
+            uuid_msb = mc_datatype.readLong(FileObject)
+            uuid_lsb = mc_datatype.readLong(FileObject)
+            amount = mc_datatype.readDouble(FileObject)
+            operation = mc_datatype.readByte(FileObject)
+    return {'EntityID': EntityID,
+            'Properties': Properties
+    }
 
 def parse_chunk_data(fileobj, socket):
     fileobj.read(13)
@@ -317,6 +334,10 @@ def parse_map_chunk_bulk(fileobj,socket):
             'ChunkMeta': metadata
     }
 
+def parse_sound_or_particle_effect(fileobj, socket):
+    # Not fully implemented. Just getting the appropriate packet data.
+    data=fileobj.read(18)
+
 def parse_named_sound_effect(fileobj, socket):
     result={}
     result["SoundName"]=mc_datatype.readString(fileobj)
@@ -351,6 +372,10 @@ def parse_set_window_items(fileobj,socket):
     result["Slots"]=slots
     return result
 
+def parse_update_window_property(fileobj,socket):
+    # Not fully implemented. Just getting the appropriate packet data.
+    data=fileobj.read(5)
+
 def parse_update_tile_entity(fileobj, socket):
     FileObject=fileobj
     X = mc_datatype.readInt(FileObject)
@@ -373,6 +398,10 @@ def parse_update_tile_entity(fileobj, socket):
             'Action': Action
     }
 
+def parse_increment_statistic(fileobj, socket):
+    # Not fully implemented. Just getting the appropriate packet data.
+    data=fileobj.read(8)
+
 def parse_player_list_item(fileobj, socket):
     result = {}
     result["PlayerName"] = mc_datatype.readString(fileobj)
@@ -383,8 +412,15 @@ def parse_player_list_item(fileobj, socket):
 def parse_player_abilities(fileobj, socket):
     result={}
     result["Flags"]=mc_datatype.readByte(fileobj)
-    result["FlyingSpeed"]=mc_datatype.readByte(fileobj)
-    result["WalkingSpeed"]=mc_datatype.readByte(fileobj)
+    result["FlyingSpeed"]=mc_datatype.readFloat(fileobj)
+    result["WalkingSpeed"]=mc_datatype.readFloat(fileobj)
+    return result
+
+def parse_plugin_message(fileobj,socket):
+    result={}
+    result["Channel"]=mc_datatype.readString(fileobj)
+    result["Length"]=mc_datatype.readShort(fileobj)
+    result["Data"]=mc_datatype.readByteArray(fileobj,result["Length"])
     return result
 
 def parse_encryption_key_request(fileobj, socket):
@@ -394,4 +430,9 @@ def parse_encryption_key_request(fileobj, socket):
     result["PublicKey"]=mc_datatype.readByteArray(fileobj,result["PublicKeyLength"])
     result["VerifyTokenLength"]=mc_datatype.readShort(fileobj)
     result["VerifyToken"]=mc_datatype.readByteArray(fileobj,result["VerifyTokenLength"])
+    return result
+
+def parse_disconnect_kick(fileobj,socket):
+    result={}
+    result["Reason"]=mc_datatype.readString(fileobj)
     return result

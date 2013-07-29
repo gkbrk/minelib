@@ -42,7 +42,7 @@ class custom_client():
         username = self.username
         host = self.host
         port = self.port
-        packet = packet_generators.packet_handshake(61, username, host, port)
+        packet = packet_generators.packet_handshake(74, username, host, port)
         self.connection.send(packet)
         data = self.connection.recv(1024)
         if data[0] == "\xfd":

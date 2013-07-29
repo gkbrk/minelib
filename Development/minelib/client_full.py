@@ -38,18 +38,24 @@ class packet_listener(threading.Thread):
             0x29: packet_parsers.parse_entity_effect,
             0x2a: packet_parsers.parse_remove_entity_effect,
             0x2b: packet_parsers.parse_set_experience,
+            0x2c: packet_parsers.parse_entity_properties,
             0x33: packet_parsers.parse_chunk_data,
             0x34: packet_parsers.parse_multi_block_change,
             0x35: packet_parsers.parse_block_change,
             0x38: packet_parsers.parse_map_chunk_bulk,
+            0x3d: packet_parsers.parse_sound_or_particle_effect,
             0x3e: packet_parsers.parse_named_sound_effect,
             0x46: packet_parsers.parse_change_game_state,
             0x67: packet_parsers.parse_set_slot,
             0x68: packet_parsers.parse_set_window_items,
+            0x69: packet_parsers.parse_update_window_property,
             0x84: packet_parsers.parse_update_tile_entity,
+            0xc8: packet_parsers.parse_increment_statistic,
             0xc9: packet_parsers.parse_player_list_item,
             0xca: packet_parsers.parse_player_abilities,
-            0xfd: packet_parsers.parse_encryption_key_request
+            0xfa: packet_parsers.parse_plugin_message,
+            0xfd: packet_parsers.parse_encryption_key_request,
+            0xff: packet_parsers.parse_disconnect_kick
         }
         self.connection=connection
     def run(self):
@@ -59,7 +65,7 @@ class packet_listener(threading.Thread):
             fileobj = connection.makefile()
             packet_id = ord(fileobj.read(1))
             if packet_id in packet_functions:
-                packet_functions[packet_id](fileobj, connection)
+                print packet_functions[packet_id](fileobj, connection)
             else:
                 print "Got unknown packet."
                 print "The packet ID is ",
