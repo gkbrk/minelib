@@ -1,7 +1,4 @@
 import minelib
 
-client=minelib.custom_client("GKBRK")
+client=minelib.custom_client("GKBRKbot")
 client.do_server_login("localhost")
-import time
-time.sleep(5)
-client.disconnect()
